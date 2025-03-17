@@ -34,6 +34,10 @@ public class Denuncia {
 	protected void onCreate() {
 	   this.dataHora = LocalDateTime.now();
     }
+	
+	public Denuncia() {
+		
+	}
 
 	public Denuncia(int id, String linha, String problema, LocalDateTime dataHora, int prefixo, String placa,
 			String empresa) {
