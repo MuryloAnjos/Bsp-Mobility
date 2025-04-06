@@ -30,5 +30,5 @@ public class DenunciaController {
 		List<DenunciaDTO> result = denunciaService.listar();
 		return result;
 	}
-
+	
 }
