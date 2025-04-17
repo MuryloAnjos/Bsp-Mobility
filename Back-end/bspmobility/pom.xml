@@ -30,6 +30,10 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+
+
+
+
         <!-- Spring Boot WebFlux (para chamadas reativas) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
