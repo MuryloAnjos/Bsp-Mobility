@@ -3,6 +3,8 @@ package com.bsp.bspmobility.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,14 +23,15 @@ public class DenunciaController {
 	private DenunciaService denunciaService;
 	
 	@PostMapping
-	public Denuncia salvar(@RequestBody Denuncia denuncia) {
-		return denunciaService.salvar(denuncia);
+	public ResponseEntity<Denuncia> salvar(@RequestBody Denuncia denuncia) {
+		Denuncia salva = denunciaService.salvar(denuncia);
+		return ResponseEntity.status(HttpStatus.CREATED).body(salva);
 	}
 	
 	@GetMapping
-	public List<DenunciaDTO> listar(){
+	public ResponseEntity<List<DenunciaDTO>> listar(){
 		List<DenunciaDTO> result = denunciaService.listar();
-		return result;
+		return ResponseEntity.ok(result);
 	}
 	
 }

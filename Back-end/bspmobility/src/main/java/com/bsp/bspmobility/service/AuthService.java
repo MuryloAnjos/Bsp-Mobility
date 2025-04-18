@@ -23,6 +23,9 @@ public class AuthService {
 				.baseUrl("http://api.olhovivo.sptrans.com.br/v2.1")
 				.defaultHeader(HttpHeaders.ACCEPT, "application/json")
 				.defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+				.codecs(configurer -> configurer
+	                    .defaultCodecs()
+	                    .maxInMemorySize(10 * 1024 * 1024)) // 10MB
 				.build();
 	}
 	
@@ -62,6 +65,10 @@ public class AuthService {
 		headers.add(HttpHeaders.COOKIE, authCookie);
 		return headers;
 	
+	}
+	
+	public WebClient getWebClientOlhoVivo() {
+		return webClient;
 	}
 	
 }

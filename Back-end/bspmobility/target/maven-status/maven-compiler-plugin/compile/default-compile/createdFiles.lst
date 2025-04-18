@@ -1,0 +1,14 @@
+com\bsp\bspmobility\model\Passo.class
+com\bsp\bspmobility\service\RotaService.class
+com\bsp\bspmobility\model\OpcaoRota.class
+com\bsp\bspmobility\service\DenunciaService.class
+com\bsp\bspmobility\config\RestTemplateConfig.class
+com\bsp\bspmobility\controller\RotaController.class
+com\bsp\bspmobility\BspmobilityApplication.class
+com\bsp\bspmobility\dto\DenunciaDTO.class
+com\bsp\bspmobility\controller\DenunciaController.class
+com\bsp\bspmobility\entities\Denuncia.class
+com\bsp\bspmobility\model\OnibusInfo.class
+com\bsp\bspmobility\repository\DenunciaRepository.class
+com\bsp\bspmobility\controller\TesteAuthController.class
+com\bsp\bspmobility\service\AuthService.class
