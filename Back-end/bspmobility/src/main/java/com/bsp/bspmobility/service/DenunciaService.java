@@ -1,9 +1,15 @@
 package com.bsp.bspmobility.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.bsp.bspmobility.dto.DenunciaDTO;
 import com.bsp.bspmobility.entities.Denuncia;
@@ -15,7 +21,27 @@ public class DenunciaService {
 	@Autowired
 	private DenunciaRepository denunciaRepository;
 	
-	public Denuncia salvar(Denuncia denuncia) {
+	private final Path rootLocation = Paths.get("uploads");
+	
+	public DenunciaService() {
+		try {
+			Files.createDirectories(rootLocation);
+		} catch (IOException e) {
+			throw new RuntimeException("Could not initialize storage", e);
+		}
+	}
+	
+	public Denuncia salvar(Denuncia denuncia, MultipartFile imagem) {
+		if (imagem != null && !imagem.isEmpty()) {
+			try {
+				String fileName = UUID.randomUUID().toString() + "_" + imagem.getOriginalFilename();
+				Path destinationFile = rootLocation.resolve(fileName).normalize().toAbsolutePath();
+				Files.copy(imagem.getInputStream(), destinationFile);
+				denuncia.setImagemPath(fileName);
+			} catch (IOException e) {
+				throw new RuntimeException("Failed to store image", e);
+			}
+		}
 		return denunciaRepository.save(denuncia);
 	}
 	
@@ -23,5 +49,4 @@ public class DenunciaService {
 	    List<Denuncia> result = denunciaRepository.findAll();
 	    return result.stream().map(DenunciaDTO::new).toList();
 	}
-
 }

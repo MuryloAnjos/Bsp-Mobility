@@ -2,6 +2,7 @@ package com.bsp.bspmobility.entities;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,30 +17,27 @@ public class Denuncia {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
 	private String linha;
-	
 	private String problema;
-	
 	private LocalDateTime dataHora;
-	
 	private int prefixo;
-	
 	private String placa;
-	
 	private String empresa;
-
+	
+	@Column(nullable = true)
+	private String imagemPath; 
+	
 	@PrePersist
 	protected void onCreate() {
 	   this.dataHora = LocalDateTime.now();
-    }
-	
+	}
+		
 	public Denuncia() {
 		
 	}
 
 	public Denuncia(int id, String linha, String problema, LocalDateTime dataHora, int prefixo, String placa,
-			String empresa) {
+			String empresa, String imagemPath) {
 		super();
 		this.id = id;
 		this.linha = linha;
@@ -48,6 +46,7 @@ public class Denuncia {
 		this.prefixo = prefixo;
 		this.placa = placa;
 		this.empresa = empresa;
+		this.imagemPath = imagemPath;
 	}
 
 	public int getId() {
@@ -106,7 +105,11 @@ public class Denuncia {
 		this.empresa = empresa;
 	}
 	
-	
-    
-	
+	public String getImagemPath() {
+		return imagemPath;
+	}
+
+	public void setImagemPath(String imagemPath) {
+		this.imagemPath = imagemPath;
+	}
 }
