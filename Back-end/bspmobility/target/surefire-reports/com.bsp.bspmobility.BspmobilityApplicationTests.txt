@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.bsp.bspmobility.BspmobilityApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.097 s -- in com.bsp.bspmobility.BspmobilityApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.986 s -- in com.bsp.bspmobility.BspmobilityApplicationTests
