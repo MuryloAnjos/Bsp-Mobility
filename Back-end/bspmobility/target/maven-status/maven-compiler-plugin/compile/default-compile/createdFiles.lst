@@ -1,9 +1,8 @@
 com\bsp\bspmobility\model\BusStop.class
-com\bsp\bspmobility\service\DenunciaService.class
-com\bsp\bspmobility\model\Bus.class
 com\bsp\bspmobility\BspmobilityApplication.class
 com\bsp\bspmobility\dto\DenunciaDTO.class
 com\bsp\bspmobility\controller\DenunciaController.class
 com\bsp\bspmobility\entities\Denuncia.class
-com\bsp\bspmobility\config\WebConfig.class
 com\bsp\bspmobility\repository\DenunciaRepository.class
+com\bsp\bspmobility\service\DenunciaService.class
+com\bsp\bspmobility\model\Bus.class
