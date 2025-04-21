@@ -2,5 +2,4 @@
 .gitignore
 src/
 .env
-target/*
-!target/*.jar
+target/
