@@ -27,7 +27,7 @@ public class DenunciaService {
 		try {
 			Files.createDirectories(rootLocation);
 		} catch (IOException e) {
-			throw new RuntimeException("Could not initialize storage", e);
+			throw new RuntimeException("Não pode inicializar o armazenamento ", e);
 		}
 	}
 	
@@ -39,7 +39,7 @@ public class DenunciaService {
 				Files.copy(imagem.getInputStream(), destinationFile);
 				denuncia.setImagemPath(fileName);
 			} catch (IOException e) {
-				throw new RuntimeException("Failed to store image", e);
+				throw new RuntimeException("Falha em Armazenar imagem ", e);
 			}
 		}
 		return denunciaRepository.save(denuncia);

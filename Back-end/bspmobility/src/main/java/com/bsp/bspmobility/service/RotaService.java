@@ -63,7 +63,7 @@ public class RotaService {
     public Mono<RotasEOnibusResponse> obterRotasEOnibus(String origem, String destino, String rotaId) {
     	
         if (origem == null || origem.trim().isEmpty() || destino == null || destino.trim().isEmpty()) {
-            logger.error("Origem ou destino inválidos: origem={}, destino={}", origem, destino);
+            logger.error("Origem ou destino inválidos: origem {}, destino {}", origem, destino);
             return Mono.just(new RotasEOnibusResponse(
                     List.of(new RotaComOnibus(null, List.of(new OnibusInfo("não há previsões", "", "", "", "", false)))),
                     null));
