@@ -1,0 +1,6 @@
+.git
+.gitignore
+src/
+.env
+target/*
+!target/*.jar
