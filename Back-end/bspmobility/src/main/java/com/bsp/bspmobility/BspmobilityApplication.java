@@ -1,25 +1,31 @@
 package com.bsp.bspmobility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import jakarta.annotation.PostConstruct;
-
 @SpringBootApplication
 public class BspmobilityApplication {
-    private static final Logger logger = LoggerFactory.getLogger(BspmobilityApplication.class);
-
-    @Value("${spring.datasource.url}")
-    private String dbUrl;
-
-    @PostConstruct
-    public void logDbUrl() {
-        logger.info("Database URL being used: {}", dbUrl);
+    public static void main(String[] args) {
+        Dotenv dotenv = Dotenv.load();
+        setPropertyOrThrow(dotenv, "DATABASE_URL");
+        setPropertyOrThrow(dotenv, "DATABASE_USERNAME");
+        setPropertyOrThrow(dotenv, "DATABASE_PASSWORD");
+        setPropertyOrThrow(dotenv, "SUPABASE_URL");
+        setPropertyOrThrow(dotenv, "SUPABASE_KEY");
+        setPropertyOrThrow(dotenv, "PORT", "8080");
+        SpringApplication.run(BspmobilityApplication.class, args);
     }
 
-    public static void main(String[] args) {
-        SpringApplication.run(BspmobilityApplication.class, args);
+    private static void setPropertyOrThrow(Dotenv dotenv, String key) {
+        String value = dotenv.get(key);
+        if (value == null) {
+            throw new IllegalStateException("Variável de ambiente" + key + "não está definido no arquivo .env");
+        }
+        System.setProperty(key, value);
+    }
+
+    private static void setPropertyOrThrow(Dotenv dotenv, String key, String defaultValue) {
+        String value = dotenv.get(key);
+        System.setProperty(key, value != null ? value : defaultValue);
     }
 }
