@@ -1,4 +1,4 @@
-package com.bsp.bspmobility.service;
+	package com.bsp.bspmobility.service;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,10 +9,12 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bsp.bspmobility.dto.DenunciaDTO;
 import com.bsp.bspmobility.entities.Denuncia;
+import com.bsp.bspmobility.projections.DenunciaProjection;
 import com.bsp.bspmobility.repository.DenunciaRepository;
 
 @Service
@@ -48,5 +50,11 @@ public class DenunciaService {
 	public List<DenunciaDTO> listar(){
 	    List<Denuncia> result = denunciaRepository.findAll();
 	    return result.stream().map(DenunciaDTO::new).toList();
+	}
+	
+	@Transactional(readOnly = true)
+	public List<DenunciaDTO> findByLinha(String linha) {
+		List<DenunciaProjection> denuncia = denunciaRepository.findByLinha(linha);
+		return denuncia.stream().map(DenunciaDTO::new).toList();
 	}
 }

@@ -20,7 +20,7 @@ public class Denuncia {
 	private String linha;
 	private String problema;
 	private LocalDateTime dataHora;
-	private int prefixo;
+	private String prefixo;
 	private String placa;
 	private String empresa;
 	
@@ -36,7 +36,7 @@ public class Denuncia {
 		
 	}
 
-	public Denuncia(int id, String linha, String problema, LocalDateTime dataHora, int prefixo, String placa,
+	public Denuncia(int id, String linha, String problema, LocalDateTime dataHora, String prefixo, String placa,
 			String empresa, String imagemPath) {
 		super();
 		this.id = id;
@@ -81,11 +81,11 @@ public class Denuncia {
 		this.dataHora = dataHora;
 	}
 
-	public int getPrefixo() {
+	public String getPrefixo() {
 		return prefixo;
 	}
 
-	public void setPrefixo(int prefixo) {
+	public void setPrefixo(String prefixo) {
 		this.prefixo = prefixo;
 	}
 

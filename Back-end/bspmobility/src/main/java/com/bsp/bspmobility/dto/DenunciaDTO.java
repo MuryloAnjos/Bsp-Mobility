@@ -1,14 +1,17 @@
 package com.bsp.bspmobility.dto;
 
+import java.time.LocalDateTime;
+
 import com.bsp.bspmobility.entities.Denuncia;
+import com.bsp.bspmobility.projections.DenunciaProjection;
 
 public class DenunciaDTO {
 
 	private String linha;
 	private String problema;
-	private int prefixo;
-	private String empresa;
-	private String imagemPath; 
+	private String prefixo;
+	private String imagemPath;
+	private LocalDateTime dataHora;
 
 	public DenunciaDTO() {
 		
@@ -18,9 +21,18 @@ public class DenunciaDTO {
 		linha = entity.getLinha();
 		problema = entity.getProblema();
 		prefixo = entity.getPrefixo();
-		empresa = entity.getEmpresa();
 		imagemPath = entity.getImagemPath();
+		dataHora = entity.getDataHora();
 	}
+	
+	public DenunciaDTO(DenunciaProjection projection) {
+		linha = projection.getLinha();
+		problema = projection.getProblema();
+		prefixo = projection.getPrefixo();
+		imagemPath = projection.getImagem_path();
+		dataHora = projection.getDataHora();
+	}
+	
 	public String getLinha() {
 		return linha;
 	}
@@ -33,22 +45,22 @@ public class DenunciaDTO {
 	public void setProblema(String problema) {
 		this.problema = problema;
 	}
-	public int getPrefixo() {
+	public String getPrefixo() {
 		return prefixo;
 	}
-	public void setPrefixo(int prefixo) {
+	public void setPrefixo(String prefixo) {
 		this.prefixo = prefixo;
-	}
-	public String getEmpresa() {
-		return empresa;
-	}
-	public void setEmpresa(String empresa) {
-		this.empresa = empresa;
 	}
 	public String getImagemPath() {
 		return imagemPath;
 	}
 	public void setImagemPath(String imagemPath) {
 		this.imagemPath = imagemPath;
+	}
+	public LocalDateTime getDataHora() {
+		return dataHora;
+	}
+	public void setDataHora(LocalDateTime dataHora) {
+		this.dataHora = dataHora;
 	}
 }

@@ -1,6 +1,7 @@
 package com.bsp.bspmobility.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/rotas")
+@CrossOrigin(origins = "*")
 public class RotaController {
 
 	private final RotaService rotaService;

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,12 +16,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.bsp.bspmobility.model.LinhaPrefixo;
 import com.bsp.bspmobility.model.OnibusInfo;
 import com.bsp.bspmobility.model.OpcaoRota;
 import com.bsp.bspmobility.model.ParadaLinha;
 import com.bsp.bspmobility.model.Passo;
 import com.bsp.bspmobility.model.RotaComOnibus;
 import com.bsp.bspmobility.model.RotasEOnibusResponse;
+import com.bsp.bspmobility.projections.DenunciaProjection;
+import com.bsp.bspmobility.repository.DenunciaRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -33,6 +37,9 @@ import reactor.core.publisher.Mono;
 public class RotaService {
 
     private static final Logger logger = LoggerFactory.getLogger(RotaService.class);
+    
+    @Autowired
+    private DenunciaRepository denunciaRepository;
 
     private final WebClient webClientGoogleMaps;
     private final AuthService authService;
@@ -65,7 +72,7 @@ public class RotaService {
         if (origem == null || origem.trim().isEmpty() || destino == null || destino.trim().isEmpty()) {
             logger.error("Origem ou destino inválidos: origem {}, destino {}", origem, destino);
             return Mono.just(new RotasEOnibusResponse(
-                    List.of(new RotaComOnibus(null, List.of(new OnibusInfo("não há previsões", "", "", "", "", false)))),
+                    List.of(new RotaComOnibus(null, List.of(new OnibusInfo("não há previsões", "", "", "", "", false)), List.of())),
                     null));
         }
 
@@ -82,7 +89,7 @@ public class RotaService {
                                     .peek(OnibusInfo::atualizarMinutos) // Chama atualizarMinutos
                                     .filter(onibus -> !onibus.getMinutos().equals("ônibus chegou")) // Remove ônibus que chegaram
                                     .collect(Collectors.toList());
-                            return new RotaComOnibus(rotaComOnibus.getRota(), onibusInfos);
+                            return new RotaComOnibus(rotaComOnibus.getRota(), onibusInfos, rotaComOnibus.getDenuncias());
                         })
                         .collect(Collectors.toList());
 
@@ -91,7 +98,7 @@ public class RotaService {
                 logger.warn("RotaId {} não encontrada no cache", rotaId); 
                
                 return Mono.just(new RotasEOnibusResponse(
-                        List.of(new RotaComOnibus(null, List.of(new OnibusInfo("não há previsões", "", "", "", "", false)))),
+                        List.of(new RotaComOnibus(null, List.of(new OnibusInfo("não há previsões", "", "", "", "", false)), List.of())),
                         null));
             }
         }
@@ -102,16 +109,18 @@ public class RotaService {
         		
                 .flatMap(rota -> {
                     List<ParadaLinha> linhas = extrairNumerosLinhas(rota);
+                    List<LinhaPrefixo> linhasEPrefixos = extrairNumeroEPrefixo(rota);
+                    
                     if (linhas.isEmpty()) {
                         logger.warn("Nenhuma linha de ônibus encontrada para a rota: {}", rota.getDuracao());
-                        return Mono.just(new RotaComOnibus(rota, List.of(new OnibusInfo("não há previsões", "", "", "", "", false))));
+                        return Mono.just(new RotaComOnibus(rota, List.of(new OnibusInfo("não há previsões", "", "", "", "", false)), buscarDenuncias(linhasEPrefixos, List.of())));
                     }
                     // Busca detalhes dos ônibus
                     return Flux.fromIterable(linhas)
                             .flatMap(this::buscarDetalhesOnibus)
                             .distinct() // Remove duplicatas
                             .collectList()
-                            .map(onibusInfos -> new RotaComOnibus(rota, onibusInfos)); // Associa à rota
+                            .map(onibusInfos -> new RotaComOnibus(rota, onibusInfos, buscarDenuncias(linhasEPrefixos, onibusInfos))); // Associa à rota
                 })
                 .collectList()
                 .map(rotasComOnibus -> {
@@ -124,9 +133,9 @@ public class RotaService {
                 })
                 .onErrorResume(e -> {
                     logger.error("Erro ao obter rotas e ônibus para {} a {}: {}", origem, destino, e.getMessage());
-                    // Retorna resposta com não há previsões
+                    
                     return Mono.just(new RotasEOnibusResponse(
-                            List.of(new RotaComOnibus(null, List.of(new OnibusInfo("não há previsões", "", "", "", "", false)))),
+                            List.of(new RotaComOnibus(null, List.of(new OnibusInfo("não há previsões", "", "", "", "", false)), List.of())),
                             null));
                 });
     }
@@ -223,7 +232,44 @@ public class RotaService {
         }
         return linhas;
     }
+    
+    private List<LinhaPrefixo> extrairNumeroEPrefixo(OpcaoRota rota) {
+        List<LinhaPrefixo> linhasEPrefixo = new ArrayList<>();
+        for (Passo passo : rota.getPassos()) {
+            if ("TRANSIT".equals(passo.getModoViagem()) && passo.getLinhaOnibus() != null && passo.getNomeParadaComeco() != null) {
+                String linha = passo.getLinhaOnibus();
+                String prefixo = null;
+                LinhaPrefixo linhaPrefixo = new LinhaPrefixo(linha, prefixo);
+                if (!linhasEPrefixo.contains(linhaPrefixo)) {
+                	linhasEPrefixo.add(linhaPrefixo);
+                }
 
+            }
+        }
+        return linhasEPrefixo;
+    }
+    
+    private List<DenunciaProjection> buscarDenuncias(List<LinhaPrefixo> linhaEPrefixos, List<OnibusInfo> onibusInfos){
+    	List<DenunciaProjection> denuncias = new ArrayList<>();
+    	
+    	for(LinhaPrefixo lp : linhaEPrefixos) {
+    		String linha = lp.getLinhaOnibus();
+    		if (linha != null && !linha.isEmpty()) {
+                denuncias.addAll(denunciaRepository.findByLinhaEPrefixo(linha, null));
+            }
+    	}
+    	
+    	for (OnibusInfo info : onibusInfos) {
+            String linha = info.getLinha();
+            String prefixo = info.getNumeroCarro();
+            if (linha != null && !linha.isEmpty() && prefixo != null && !prefixo.isEmpty()) {
+                denuncias.addAll(denunciaRepository.findByLinhaEPrefixo(linha, prefixo));
+            }
+        }
+    	return denuncias.stream().distinct().collect(Collectors.toList());
+    }
+    
+   
     
     private boolean isAntesDoPonto(double latParada, double lngParada, double latVeiculo, double lngVeiculo, int sentido) {
     	double deltaLat = latVeiculo - latParada;

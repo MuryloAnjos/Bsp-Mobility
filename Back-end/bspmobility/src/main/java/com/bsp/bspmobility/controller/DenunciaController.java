@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import com.bsp.bspmobility.service.DenunciaService;
 
 @RestController
 @RequestMapping("/denuncias")
+@CrossOrigin(origins = "*")
 public class DenunciaController {
 	
 	@Autowired
@@ -25,7 +27,7 @@ public class DenunciaController {
 	//PeMoura
 	@PostMapping(consumes = {"multipart/form-data"})
 	public ResponseEntity<Denuncia> salvar(
-	        @RequestParam("prefixo") Integer prefixo,
+	        @RequestParam("prefixo") String prefixo,
 	        @RequestParam("empresa") String empresa,
 	        @RequestParam("linha") String linha,
 	        @RequestParam("placa") String placa,
@@ -49,5 +51,11 @@ public class DenunciaController {
 	public ResponseEntity<List<DenunciaDTO>> listar(){
 		List<DenunciaDTO> result = denunciaService.listar();
 		return ResponseEntity.ok(result);
+	}
+	
+	@GetMapping("/por-linha")
+	public ResponseEntity<List<DenunciaDTO>> listarPorLinha(@RequestParam String linha){
+		List<DenunciaDTO> denunciasPorLinha = denunciaService.findByLinha(linha);
+		return ResponseEntity.ok(denunciasPorLinha);
 	}
 }
