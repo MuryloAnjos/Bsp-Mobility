@@ -1,31 +1,33 @@
 package com.bsp.bspmobility;
-import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class BspmobilityApplication {
     public static void main(String[] args) {
-        Dotenv dotenv = Dotenv.load();
-        setPropertyOrThrow(dotenv, "DATABASE_URL");
-        setPropertyOrThrow(dotenv, "DATABASE_USERNAME");
-        setPropertyOrThrow(dotenv, "DATABASE_PASSWORD");
-        setPropertyOrThrow(dotenv, "SUPABASE_URL");
-        setPropertyOrThrow(dotenv, "SUPABASE_KEY");
-        setPropertyOrThrow(dotenv, "PORT", "8080");
+        // Carrega as variáveis de ambiente diretamente
+        setPropertyOrThrow("DATABASE_URL");
+        setPropertyOrThrow("SPTRANS_API_TOKEN"); // Adicionada porque está no application.properties
+        setPropertyOrThrow("PORT", "8080"); // Mantém o padrão 8080 se não estiver definido
+
+        // Opcional: Log para depuração
+        System.out.println("DATABASE_URL: " + System.getenv("DATABASE_URL"));
+        System.out.println("SPTRANS_API_TOKEN: " + System.getenv("SPTRANS_API_TOKEN"));
+        System.out.println("PORT: " + System.getProperty("PORT"));
+
         SpringApplication.run(BspmobilityApplication.class, args);
     }
 
-    private static void setPropertyOrThrow(Dotenv dotenv, String key) {
-        String value = dotenv.get(key);
+    private static void setPropertyOrThrow(String key) {
+        String value = System.getenv(key);
         if (value == null) {
-            throw new IllegalStateException("Variável de ambiente" + key + "não está definido no arquivo .env");
+            throw new IllegalStateException("Variável de ambiente " + key + " não está definida");
         }
         System.setProperty(key, value);
     }
 
-    private static void setPropertyOrThrow(Dotenv dotenv, String key, String defaultValue) {
-        String value = dotenv.get(key);
+    private static void setPropertyOrThrow(String key, String defaultValue) {
+        String value = System.getenv(key);
         System.setProperty(key, value != null ? value : defaultValue);
     }
 }
